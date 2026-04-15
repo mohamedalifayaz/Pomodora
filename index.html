@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moto Focus &mdash; Pomodoro Timer</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+
+    <!-- Ambient background -->
+    <div class="bg-circles">
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+      <div class="circle circle-3"></div>
+    </div>
+
+    <div class="app-wrapper">
+
+      <!-- ═══ LEFT SIDEBAR ═══════════════════════════════════════ -->
+      <aside class="sidebar">
+
+        <!-- Logo + Settings -->
+        <header class="header">
+          <div class="logo">
+            <span class="logo-icon">&#x1F3CD;&#xFE0F;</span>
+            <span class="logo-text">Moto Focus</span>
+          </div>
+          <button class="btn-icon settings-btn" id="settingsBtn" title="Settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </header>
+
+        <!-- Settings Panel -->
+        <div class="settings-panel" id="settingsPanel">
+          <div class="settings-header">
+            <span class="settings-title">&#x1F3C1; Garage Settings</span>
+            <button class="settings-close" id="settingsClose">&#x2715;</button>
+          </div>
+          <div class="settings-body">
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Auto-start Break</span>
+                <span class="setting-desc">Start break automatically after focus ends</span>
+              </div>
+              <label class="toggle"><input type="checkbox" id="autoStartBreak" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="setting-divider"></div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <span class="setting-label">Auto-start Focus</span>
+                <span class="setting-desc">Start focus automatically after break ends</span>
+              </div>
+              <label class="toggle"><input type="checkbox" id="autoStartFocus" /><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Session Tracker -->
+        <div class="session-tracker">
+          <div class="session-tracker-header">
+            <span class="session-label-text">Session Progress</span>
+            <span class="session-cycle-text" id="sessionCycleText">0 / 4</span>
+          </div>
+          <div class="session-dots" id="sessionDots"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-block">
+          <span class="stats-block-title">Today&#x2019;s Stats</span>
+          <div class="stat-item">
+            <div class="stat-item-left">
+              <div class="stat-icon">&#x1F3AF;</div>
+              <div class="stat-text">
+                <span class="stat-name">Today</span>
+                <span class="stat-value" id="todayCount">0</span>
+              </div>
+            </div>
+            <span class="stat-badge">sessions</span>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-left">
+              <div class="stat-icon">&#x1F3C6;</div>
+              <div class="stat-text">
+                <span class="stat-name">All Time</span>
+                <span class="stat-value" id="totalCount">0</span>
+              </div>
+            </div>
+            <span class="stat-badge">total</span>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item-left">
+              <div class="stat-icon">&#x23F1;&#xFE0F;</div>
+              <div class="stat-text">
+                <span class="stat-name">Focus Time</span>
+                <span class="stat-value" id="focusTime">0m</span>
+              </div>
+            </div>
+            <span class="stat-badge">logged</span>
+          </div>
+        </div>
+
+        <!-- Current Task -->
+        <div class="task-section">
+          <span class="task-section-title">Current Mission</span>
+          <div class="task-input-wrap">
+            <span class="task-input-icon">&#x270D;&#xFE0F;</span>
+            <input type="text" class="task-input" id="taskInput"
+              placeholder="What are you riding towards?" maxlength="60" />
+          </div>
+        </div>
+
+        <!-- Keyboard Shortcuts -->
+        <div class="keyboard-shortcuts">
+          <span class="shortcuts-title">&#x2328; Shortcuts</span>
+          <div class="shortcuts-list">
+            <div class="shortcut"><kbd>Space</kbd>Start / Pause</div>
+            <div class="shortcut"><kbd>R</kbd>Reset</div>
+            <div class="shortcut"><kbd>S</kbd>Skip</div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ═══ RIGHT MAIN PANEL ════════════════════════════════════ -->
+      <main class="main-panel">
+
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+          <button class="tab active" data-mode="focus">&#x1F3CD;&#xFE0F; &nbsp;Ride (Focus)</button>
+          <button class="tab" data-mode="break">&#x1F527; &nbsp;Pit Stop (Break)</button>
+        </div>
+
+        <!-- Timer Ring -->
+        <div class="timer-card">
+          <div class="ring-container">
+            <svg class="progress-ring" viewBox="0 0 220 220">
+              <defs>
+                <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#ff5a1f"/>
+                  <stop offset="100%" stop-color="#ffb000"/>
+                </linearGradient>
+                <linearGradient id="breakGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#00c2ff"/>
+                  <stop offset="100%" stop-color="#1d4ed8"/>
+                </linearGradient>
+                <linearGradient id="warnGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   stop-color="#ff2222"/>
+                  <stop offset="100%" stop-color="#ff6600"/>
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                  <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <circle class="ring-track"    cx="110" cy="110" r="96"/>
+              <circle class="ring-progress" id="ringProgress" cx="110" cy="110" r="96" filter="url(#glow)"/>
+            </svg>
+            <div class="timer-display">
+              <div class="time" id="timeDisplay">25:00</div>
+              <div class="mode-label" id="modeLabel">Focus Time</div>
+            </div>
+          </div>
+
+          <!-- Task chip shown under the ring -->
+          <div class="current-task-chip" id="currentTaskChip">No mission set &mdash; add one in the sidebar</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button class="btn-icon" id="resetBtn" title="Reset (R)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+            </svg>
+          </button>
+          <button class="btn-primary" id="startStopBtn">
+            <span class="btn-icon-play" id="btnIcon">
+              <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+            </span>
+            <span id="btnText">Start Ride</span>
+          </button>
+          <button class="btn-icon" id="skipBtn" title="Skip (S)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polygon points="5,4 15,12 5,20" fill="currentColor" stroke="none"/>
+              <line x1="19" y1="4" x2="19" y2="20"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat">
+            <span class="stat-value" id="todayCountBar">0</span>
+            <span class="stat-label">Today</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value" id="totalCountBar">0</span>
+            <span class="stat-label">All Time</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat">
+            <span class="stat-value" id="focusTimeBar">0m</span>
+            <span class="stat-label">Focus Time</span>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+      <span class="toast-icon" id="toastIcon">&#x1F345;</span>
+      <span id="toastMsg">Time's up!</span>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

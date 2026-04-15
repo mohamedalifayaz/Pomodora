@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>agents.md — Project Intelligence Guide</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:            #0f0f1a;
+      --surface:       rgba(255,255,255,0.05);
+      --surface-hover: rgba(255,255,255,0.08);
+      --border:        rgba(255,255,255,0.10);
+      --text-primary:  #f0f0f5;
+      --text-muted:    rgba(240,240,245,0.55);
+      --accent-red:    #ff6b6b;
+      --accent-orange: #ff9a56;
+      --accent-green:  #4ecdc4;
+      --accent-blue:   #74b9ff;
+      --accent-purple: #a29bfe;
+      --accent-yellow: #ffeaa7;
+      --radius-lg:     16px;
+      --radius-md:     10px;
+      --radius-sm:     6px;
+      --shadow:        0 8px 32px rgba(0,0,0,0.4);
+      --transition:    0.2s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────────────────── */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    /* ─── Sidebar ────────────────────────────────────────────────────── */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.03);
+      border-right: 1px solid var(--border);
+      padding: 28px 0 40px;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .sidebar-brand .emoji { font-size: 22px; }
+    .sidebar-brand .title { font-weight: 700; font-size: 14px; color: var(--text-primary); }
+    .sidebar-brand .sub   { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    .nav-section { padding: 0 12px; margin-bottom: 6px; }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      transition: var(--transition);
+    }
+    .nav-item:hover, .nav-item.active {
+      background: var(--surface-hover);
+      color: var(--text-primary);
+    }
+    .nav-item .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ─── Main Content ───────────────────────────────────────────────── */
+    .main {
+      padding: 48px 60px 80px;
+      max-width: 960px;
+    }
+
+    /* ─── Top Banner ─────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, rgba(255,107,107,0.15), rgba(116,185,255,0.10));
+      border: 1px solid rgba(255,107,107,0.25);
+      border-radius: var(--radius-lg);
+      padding: 32px 36px;
+      margin-bottom: 48px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,107,107,0.15);
+      border: 1px solid rgba(255,107,107,0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-red);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 10px; }
+    .hero h1 span { color: var(--accent-red); }
+    .hero p { color: var(--text-muted); font-size: 14px; max-width: 560px; }
+
+    /* ─── Section headings ───────────────────────────────────────────── */
+    .section { margin-bottom: 52px; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-title .icon {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin: 24px 0 10px;
+    }
+    h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin: 18px 0 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    p { color: var(--text-muted); margin-bottom: 12px; }
+
+    /* ─── Cards ──────────────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+    .card-sub { font-size: 13px; color: var(--text-muted); }
+
+    /* ─── Sub-project Cards ──────────────────────────────────────────── */
+    .subproject-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .subproject-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .subproject-card:hover { border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+    .subproject-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .subproject-card.web::before  { background: linear-gradient(90deg, var(--accent-red), var(--accent-orange)); }
+    .subproject-card.py::before   { background: linear-gradient(90deg, #3a86ff, var(--accent-green)); }
+    .sp-emoji { font-size: 28px; margin-bottom: 10px; }
+    .sp-name  { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .sp-type  { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .sp-tags  { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sp-tag {
+      background: rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    /* ─── Tables ─────────────────────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    th {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-muted);
+      vertical-align: top;
+    }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    td code, th code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-blue);
+      background: rgba(116,185,255,0.1);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ─── Code blocks ────────────────────────────────────────────────── */
+    .code-block {
+      background: #1a1a2e;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.04);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-lang {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .code-copy {
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      transition: var(--transition);
+    }
+    .code-copy:hover { background: var(--surface-hover); color: var(--text-primary); }
+    pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      color: #abb2bf;
+    }
+    pre .kw  { color: #c678dd; }
+    pre .str { color: #98c379; }
+    pre .cm  { color: #5c6370; font-style: italic; }
+    pre .nb  { color: #e06c75; }
+    pre .nm  { color: #d19a66; }
+    pre .fn  { color: #61afef; }
+
+    /* ─── Inline code ────────────────────────────────────────────────── */
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-blue);
+      background: rgba(116,185,255,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* ─── Badge pills ────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-red    { background: rgba(255,107,107,0.15); color: var(--accent-red);    border: 1px solid rgba(255,107,107,0.25); }
+    .badge-green  { background: rgba(78,205,196,0.15);  color: var(--accent-green);  border: 1px solid rgba(78,205,196,0.25);  }
+    .badge-blue   { background: rgba(116,185,255,0.15); color: var(--accent-blue);   border: 1px solid rgba(116,185,255,0.25); }
+    .badge-purple { background: rgba(162,155,254,0.15); color: var(--accent-purple); border: 1px solid rgba(162,155,254,0.25); }
+    .badge-orange { background: rgba(255,154,86,0.15);  color: var(--accent-orange); border: 1px solid rgba(255,154,86,0.25);  }
+
+    /* ─── State shape ────────────────────────────────────────────────── */
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .state-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .state-key   { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent-blue); margin-bottom: 3px; }
+    .state-type  { font-size: 11px; color: var(--accent-purple); margin-bottom: 3px; font-family: 'JetBrains Mono', monospace; }
+    .state-desc  { font-size: 11px; color: var(--text-muted); }
+
+    /* ─── Body-class table colours ───────────────────────────────────── */
+    .bc-focus { color: var(--accent-red); }
+    .bc-break { color: var(--accent-green); }
+    .bc-warn  { color: var(--accent-orange); }
+
+    /* ─── Checklist ──────────────────────────────────────────────────── */
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-muted);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .check-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+    .checklist li strong { color: var(--text-primary); font-weight: 600; }
+
+    /* ─── Issues list ────────────────────────────────────────────────── */
+    .issue-list { display: flex; flex-direction: column; gap: 10px; }
+    .issue-item {
+      display: flex;
+      gap: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent-orange);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+    }
+    .issue-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-orange);
+      flex-shrink: 0;
+      width: 22px;
+    }
+    .issue-body { font-size: 13px; color: var(--text-muted); }
+    .issue-body strong { color: var(--text-primary); }
+
+    /* ─── AI Instruction cards ───────────────────────────────────────── */
+    .ai-card {
+      display: flex;
+      gap: 14px;
+      background: rgba(162,155,254,0.07);
+      border: 1px solid rgba(162,155,254,0.2);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+    .ai-bullet { font-size: 16px; flex-shrink: 0; }
+    .ai-text   { font-size: 13px; color: var(--text-muted); }
+    .ai-text strong { color: var(--text-primary); }
+
+    /* ─── File tree ──────────────────────────────────────────────────── */
+    .file-tree {
+      background: #1a1a2e;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 2;
+    }
+    .ft-dir   { color: var(--accent-blue); }
+    .ft-html  { color: var(--accent-orange); }
+    .ft-css   { color: #6fb3d2; }
+    .ft-js    { color: #f0db4f; }
+    .ft-py    { color: var(--accent-green); }
+    .ft-md    { color: var(--text-muted); }
+    .ft-cfg   { color: var(--accent-purple); }
+    .ft-dim   { color: rgba(255,255,255,0.25); }
+    .ft-comment { color: rgba(255,255,255,0.3); font-style: italic; margin-left: 8px; }
+
+    /* ─── Audio / subsystem pills ────────────────────────────────────── */
+    .freq-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .freq-pill {
+      background: rgba(78,205,196,0.12);
+      border: 1px solid rgba(78,205,196,0.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-green);
+    }
+
+    /* ─── Divider ────────────────────────────────────────────────────── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    /* ─── Responsive ─────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .page-wrapper { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { padding: 32px 24px 60px; }
+      .subproject-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- ── Sidebar ── -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <span class="emoji">🍅</span>
+      <div>
+        <div class="title">Pomodora</div>
+        <div class="sub">Project Intelligence Guide</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <a class="nav-item" href="#overview"><span class="dot" style="background:#ff6b6b"></span>Project Overview</a>
+      <a class="nav-item" href="#structure"><span class="dot" style="background:#74b9ff"></span>File Structure</a>
+    </div>
+
+    <div class="nav-section" style="margin-top:12px">
+      <div class="nav-label">Sub-projects</div>
+      <a class="nav-item" href="#pomodoro"><span class="dot" style="background:#ff9a56"></span>Pomodoro Timer</a>
+      <a class="nav-item" href="#state"><span class="dot" style="background:#a29bfe"></span>State &amp; Storage</a>
+      <a class="nav-item" href="#css"><span class="dot" style="background:#6fb3d2"></span>CSS Architecture</a>
+      <a class="nav-item" href="#audio"><span class="dot" style="background:#4ecdc4"></span>Audio System</a>
+      <a class="nav-item" href="#python"><span class="dot" style="background:#55efc4"></span>Python Games</a>
+    </div>
+
+    <div class="nav-section" style="margin-top:12px">
+      <div class="nav-label">Guides</div>
+      <a class="nav-item" href="#conventions"><span class="dot" style="background:#ffeaa7"></span>Conventions</a>
+      <a class="nav-item" href="#issues"><span class="dot" style="background:#fd79a8"></span>Known Issues</a>
+      <a class="nav-item" href="#roadmap"><span class="dot" style="background:#00cec9"></span>Roadmap</a>
+      <a class="nav-item" href="#ai"><span class="dot" style="background:#a29bfe"></span>AI Instructions</a>
+    </div>
+  </nav>
+
+  <!-- ── Main ── -->
+  <main class="main">
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-badge">📄 agents.md</div>
+      <h1><span>agents.md</span> — Project Intelligence Guide</h1>
+      <p>This document helps AI agents and contributors quickly understand the project
+         structure, architecture decisions, coding patterns, and conventions used
+         throughout this codebase.</p>
+    </div>
+
+    <!-- ── Project Overview ── -->
+    <section class="section" id="overview">
+      <div class="section-title"><span class="icon">📁</span> Project Overview</div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px">
+          <span style="font-size:24px">🍅</span>
+          <div>
+            <div class="card-title" style="font-size:16px">Pomodora</div>
+            <code>/home/workspace/Pomodora</code>
+          </div>
+        </div>
+        <p style="margin:0">Two distinct sub-projects sharing the same workspace: a polished Pomodoro Timer web app and three Python CLI mini-games.</p>
+      </div>
+
+      <div class="subproject-grid">
+        <div class="subproject-card web">
+          <div class="sp-emoji">⏱️</div>
+          <div class="sp-name">Pomodoro Timer</div>
+          <div class="sp-type">Web App — front-end only</div>
+          <div class="sp-tags">
+            <span class="sp-tag">HTML5</span>
+            <span class="sp-tag">CSS3</span>
+            <span class="sp-tag">Vanilla JS</span>
+            <span class="sp-tag">index.html</span>
+          </div>
+        </div>
+        <div class="subproject-card py">
+          <div class="sp-emoji">🐍</div>
+          <div class="sp-name">Python Mini-Games</div>
+          <div class="sp-type">CLI Games</div>
+          <div class="sp-tags">
+            <span class="sp-tag">Python 3</span>
+            <span class="sp-tag">stdlib only</span>
+            <span class="sp-tag">.py files</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Sub-project</th><th>Type</th><th>Language(s)</th><th>Entry Point</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Pomodoro Timer</td>
+              <td><span class="badge badge-orange">Web App</span></td>
+              <td>HTML + CSS + Vanilla JS</td>
+              <td><code>index.html</code></td>
+            </tr>
+            <tr>
+              <td>Python Mini-Games</td>
+              <td><span class="badge badge-green">CLI</span></td>
+              <td>Python 3</td>
+              <td>Individual <code>.py</code> files</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── File Structure ── -->
+    <section class="section" id="structure">
+      <div class="section-title"><span class="icon">🗂️</span> File Structure</div>
+      <div class="file-tree">
+        <span class="ft-dir">Pomodora/</span><br>
+        <span class="ft-dim">├── </span><span class="ft-html">index.html</span><span class="ft-comment"># Pomodoro Timer — full app markup + SVG ring</span><br>
+        <span class="ft-dim">├── </span><span class="ft-css">style.css</span><span class="ft-comment"># Pomodoro Timer — all styles (dark theme, animations)</span><br>
+        <span class="ft-dim">├── </span><span class="ft-js">app.js</span><span class="ft-comment"># Pomodoro Timer — all logic (timer, audio, state, DOM)</span><br>
+        <span class="ft-dim">│</span><br>
+        <span class="ft-dim">├── </span><span class="ft-py">guess_the_number.py</span><span class="ft-comment"># CLI game: player guesses a random number</span><br>
+        <span class="ft-dim">├── </span><span class="ft-py">hangman.py</span><span class="ft-comment"># CLI game: classic letter-guessing word game</span><br>
+        <span class="ft-dim">├── </span><span class="ft-py">play_tic_tac_toe.py</span><span class="ft-comment"># CLI game: two-player 3×3 Tic-Tac-Toe</span><br>
+        <span class="ft-dim">│</span><br>
+        <span class="ft-dim">├── </span><span class="ft-md">README.md</span><span class="ft-comment"># Project overview and challenge list</span><br>
+        <span class="ft-dim">├── </span><span class="ft-md">agents.md</span><span class="ft-comment"># ← This document</span><br>
+        <span class="ft-dim">│</span><br>
+        <span class="ft-dim">└── </span><span class="ft-dir">.zcode/</span><br>
+        <span class="ft-dim">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="ft-cfg">launch.json</span><br>
+        <span class="ft-dim">&nbsp;&nbsp;&nbsp;&nbsp;├── </span><span class="ft-cfg">settings.json</span><br>
+        <span class="ft-dim">&nbsp;&nbsp;&nbsp;&nbsp;└── </span><span class="ft-cfg">tasks.json</span>
+      </div>
+    </section>
+
+    <!-- ── Pomodoro Timer ── -->
+    <section class="section" id="pomodoro">
+      <div class="section-title"><span class="icon">🍅</span> Pomodoro Timer — Web App</div>
+
+      <p>A fully functional, visually polished Pomodoro productivity timer. No frameworks, no build steps — pure HTML/CSS/JS served directly from <code>index.html</code>.</p>
+
+      <h3>Technology Stack</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px">
+        <span class="badge badge-orange">HTML5 — SVG ring + Google Fonts</span>
+        <span class="badge badge-blue">CSS3 — custom properties, animations</span>
+        <span class="badge badge-green">Vanilla JS ES6+ — Web Audio API, localStorage</span>
+      </div>
+
+      <h3>app.js — Section Architecture</h3>
+      <p>All logic lives in <code>app.js</code>, organised by <code>// ─── Section Name ───</code> banners:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Section</th><th>Responsibility</th></tr></thead>
+          <tbody>
+            <tr><td><code>CONFIG</code></td><td>Immutable timer durations and labels per mode</td></tr>
+            <tr><td><code>state</code></td><td>Single mutable object — all runtime state lives here</td></tr>
+            <tr><td><code>DOM refs</code></td><td>All <code>getElementById</code> / <code>querySelector</code> calls (declared once)</td></tr>
+            <tr><td>Ring helpers</td><td>SVG <code>strokeDashoffset</code> calculation for the circular progress ring</td></tr>
+            <tr><td>Display</td><td><code>updateDisplay()</code>, <code>formatTime()</code>, <code>renderStats()</code>, <code>renderSessionDots()</code></td></tr>
+            <tr><td>Mode switching</td><td><code>setMode(mode, autoStart)</code> — switches between "focus" and "break"</td></tr>
+            <tr><td>Timer logic</td><td><code>startTimer()</code>, <code>stopTimer()</code>, <code>handleTimerEnd()</code></td></tr>
+            <tr><td>Button state</td><td><code>setBtnState(running)</code> — toggles Play/Pause icon + text</td></tr>
+            <tr><td>Toast</td><td><code>showToast(icon, msg)</code> — temporary notification overlay</td></tr>
+            <tr><td>Audio Context</td><td>Singleton <code>AudioContext</code> getter</td></tr>
+            <tr><td>Bell Sound</td><td><code>playBell()</code> — multi-harmonic bell when a session completes</td></tr>
+            <tr><td>Event listeners</td><td>Click handlers for Start/Stop, Reset, Skip, Tab buttons</td></tr>
+            <tr><td>Keyboard shortcuts</td><td><code>Space</code> = Start/Pause, <code>R</code> = Reset, <code>S</code> = Skip</td></tr>
+            <tr><td>Init</td><td>Ring setup, initial <code>updateDisplay()</code>, <code>renderStats()</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Key Constants</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">JavaScript</span>
+          <button class="code-copy" onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre>CONFIG.focus.duration = 25 * 60   <span class="cm">// 1500 seconds</span>
+CONFIG.break.duration =  5 * 60   <span class="cm">//  300 seconds</span>
+SESSIONS_PER_CYCLE    = 4         <span class="cm">// dots shown in the header</span>
+CIRCUMFERENCE         = 2π × 96  <span class="cm">// ≈ 603.19 (SVG circle r=96)</span></pre>
+      </div>
+
+      <h3>SVG Progress Ring</h3>
+      <div class="card">
+        <p style="margin-bottom:8px">Defined in <code>index.html</code> as inline <code>&lt;svg viewBox="0 0 220 220"&gt;</code>.</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--text-muted)">
+          <li>🔘 Track: <code>&lt;circle class="ring-track"&gt;</code> — static grey arc</li>
+          <li>🔴 Progress: <code>&lt;circle class="ring-progress" id="ringProgress"&gt;</code> — animated</li>
+          <li>🎨 Gradients: <code>ringGradient</code> (red) · <code>breakGradient</code> (green) · <code>warnGradient</code> (orange)</li>
+          <li>✨ Filter: <code>&lt;filter id="glow"&gt;</code> — Gaussian blur + merge for glow effect</li>
+          <li>📐 Formula: <code>offset = CIRCUMFERENCE × (1 − ratio)</code></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ── State & Storage ── -->
+    <section class="section" id="state">
+      <div class="section-title"><span class="icon">💾</span> State &amp; localStorage</div>
+
+      <h3>State Shape</h3>
+      <div class="state-grid">
+        <div class="state-item"><div class="state-key">mode</div><div class="state-type">"focus" | "break"</div><div class="state-desc">Current timer mode</div></div>
+        <div class="state-item"><div class="state-key">running</div><div class="state-type">Boolean</div><div class="state-desc">Is the timer active?</div></div>
+        <div class="state-item"><div class="state-key">timeLeft</div><div class="state-type">Number</div><div class="state-desc">Seconds remaining</div></div>
+        <div class="state-item"><div class="state-key">totalSeconds</div><div class="state-type">Number</div><div class="state-desc">Total seconds for current mode</div></div>
+        <div class="state-item"><div class="state-key">timerId</div><div class="state-type">Number | null</div><div class="state-desc">setInterval ID</div></div>
+        <div class="state-item"><div class="state-key">sessionsDone</div><div class="state-type">Number</div><div class="state-desc">Completed focus sessions</div></div>
+        <div class="state-item"><div class="state-key">todayCount</div><div class="state-type">Number</div><div class="state-desc">Persisted via localStorage</div></div>
+        <div class="state-item"><div class="state-key">totalCount</div><div class="state-type">Number</div><div class="state-desc">All-time sessions (persisted)</div></div>
+        <div class="state-item"><div class="state-key">focusMins</div><div class="state-type">Number</div><div class="state-desc">Total focus minutes (persisted)</div></div>
+        <div class="state-item"><div class="state-key">lastDate</div><div class="state-type">String</div><div class="state-desc">ISO date string for daily reset</div></div>
+      </div>
+
+      <h3>localStorage Keys</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Key</th><th>Value</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pomo_today</code></td><td>Number</td><td>Focus sessions completed today</td></tr>
+            <tr><td><code>pomo_total</code></td><td>Number</td><td>All-time focus sessions</td></tr>
+            <tr><td><code>pomo_focus</code></td><td>Number</td><td>Total accumulated focus minutes</td></tr>
+            <tr><td><code>pomo_date</code></td><td>String</td><td><code>new Date().toDateString()</code> — used to reset daily counter</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── CSS Architecture ── -->
+    <section class="section" id="css">
+      <div class="section-title"><span class="icon">🎨</span> CSS Architecture</div>
+
+      <p>All styles are in <code>style.css</code>, following a <strong>section-per-component</strong> pattern separated by <code>/* ─── Section Name ───── */</code> banners.</p>
+
+      <h3>CSS Custom Properties (<code>:root</code>)</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">CSS</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm">/* Mode gradients */</span>
+--focus-primary / --focus-secondary   <span class="cm">/* Red-orange for focus mode */</span>
+--break-primary / --break-secondary   <span class="cm">/* Green-teal for break mode */</span>
+
+<span class="cm">/* Base palette */</span>
+--bg               <span class="cm">/* #0f0f1a — deep dark background */</span>
+--surface          <span class="cm">/* Semi-transparent card surfaces */</span>
+--surface-hover
+--border           <span class="cm">/* Subtle white border */</span>
+--text-primary     <span class="cm">/* White */</span>
+--text-muted       <span class="cm">/* 45% white */</span>
+
+<span class="cm">/* Spacing & effects */</span>
+--radius-lg / --radius-md / --radius-sm
+--shadow / --transition</pre>
+      </div>
+
+      <h3>Body-Class State Theming</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Class</th><th>When Applied</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><code class="bc-break">body.break-mode</code></td>
+              <td>During short break</td>
+              <td>Ring, tab, and button turn green</td>
+            </tr>
+            <tr>
+              <td><code class="bc-focus">body.running</code></td>
+              <td>Timer is active</td>
+              <td>Pulse animation on ring and digits</td>
+            </tr>
+            <tr>
+              <td><code class="bc-warn">body.warning</code></td>
+              <td>Last 10% of time remaining</td>
+              <td>Ring and digits turn red and flash</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Audio System ── -->
+    <section class="section" id="audio">
+      <div class="section-title"><span class="icon">🔔</span> Audio System</div>
+
+      <p>Built entirely on the <strong>Web Audio API</strong> — no audio files needed. <code>AudioContext</code> is lazily instantiated and reused (singleton pattern) to respect browser autoplay policies.</p>
+
+      <h3>Bell Sound (<code>playBell</code>)</h3>
+      <div class="card">
+        <p style="margin-bottom:10px">Four sine-wave oscillators at harmonic frequencies with exponential gain decay, repeated 3 times with 0.7 s spacing.</p>
+        <div class="freq-row">
+          <span class="freq-pill">520 Hz</span>
+          <span class="freq-pill">1 040 Hz</span>
+          <span class="freq-pill">1 560 Hz</span>
+          <span class="freq-pill">2 600 Hz</span>
+        </div>
+        <p style="font-size:12px; color:var(--text-muted); margin:0">Called once when the timer starts and once when it ends.</p>
+      </div>
+
+      <div class="ai-card">
+        <span class="ai-bullet">⚠️</span>
+        <div class="ai-text">Always wrap Web Audio API calls in <code>try/catch</code> and <strong>fail silently</strong> — browser policy differences can throw exceptions. The old <code>playTick</code> / <code>startTicking</code> / <code>stopTicking</code> functions have been removed.</div>
+      </div>
+    </section>
+
+    <!-- ── Python Games ── -->
+    <section class="section" id="python">
+      <div class="section-title"><span class="icon">🐍</span> Python CLI Games</div>
+
+      <p>Three beginner-friendly text-based games. Standalone scripts, standard library only — no <code>requirements.txt</code> needed.</p>
+
+      <h4>guess_the_number.py</h4>
+      <div class="card">
+        <div class="card-title">Entry: <code>guess_the_number()</code></div>
+        <p>Custom range input → random secret → 10 attempts → hot/cold feedback → win streak → play-again loop. Catches <code>ValueError</code> for non-integer input.</p>
+      </div>
+
+      <h4>hangman.py</h4>
+      <div class="card">
+        <div class="card-title">Entry: <code>hangman()</code> · Helpers: <code>choose_random_word()</code>, <code>display_word()</code></div>
+        <p>Random word from hardcoded list → letter guessing → 6 incorrect guesses allowed → masked word each round.<br>
+        Word list: <code>["python", "hangman", "programming", "challenge", "computer"]</code></p>
+      </div>
+
+      <h4>play_tic_tac_toe.py</h4>
+      <div class="card">
+        <div class="card-title">Entry: <code>play_tic_tac_toe()</code> · Helpers: <code>print_board()</code>, <code>check_win()</code>, <code>is_full()</code></div>
+        <p>Two-player 3×3 grid as a nested list. Row/column input, win check (rows, cols, diagonals), draw check. Empty cell = <code>" "</code>.</p>
+      </div>
+
+      <h3>Running the Games</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre>python3 guess_the_number.py
+python3 hangman.py
+python3 play_tic_tac_toe.py</pre>
+      </div>
+
+      <h3>Running the Pomodoro Timer</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+        <pre><span class="cm"># Option A — direct file open</span>
+open index.html
+
+<span class="cm"># Option B — local HTTP server</span>
+python3 -m http.server 8080
+<span class="cm"># Then visit http://localhost:8080</span></pre>
+      </div>
+    </section>
+
+    <!-- ── Conventions ── -->
+    <section class="section" id="conventions">
+      <div class="section-title"><span class="icon">🎨</span> Coding Conventions</div>
+
+      <h3>JavaScript (<code>app.js</code>)</h3>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:20px">
+        <li class="card card-sub">✅ No framework, no transpiler — plain ES6+ runs directly in the browser</li>
+        <li class="card card-sub">✅ Single <code>state</code> object pattern — all mutable data in one place</li>
+        <li class="card card-sub">✅ DOM refs declared once at the top, never re-queried inside functions</li>
+        <li class="card card-sub">✅ Section banners: <code>// ─── Section Name ───</code></li>
+        <li class="card card-sub">✅ Always wrap Web Audio calls in <code>try/catch</code> and fail silently</li>
+        <li class="card card-sub">✅ Use <code>pomo_</code> prefix for all localStorage keys</li>
+        <li class="card card-sub">✅ Prefer <code>const</code> / <code>let</code>; never <code>var</code>. Semicolons are used throughout.</li>
+      </ul>
+
+      <h3>CSS (<code>style.css</code>)</h3>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:20px">
+        <li class="card card-sub">✅ Use CSS custom properties (<code>var(--name)</code>) for every repeated value</li>
+        <li class="card card-sub">✅ Section-per-component comment banner pattern</li>
+        <li class="card card-sub">✅ <code>@keyframes</code> at the bottom of their relevant section</li>
+        <li class="card card-sub">✅ Body-class-driven theming instead of inline styles</li>
+      </ul>
+
+      <h3>Python (game files)</h3>
+      <ul style="list-style:none; display:flex; flex-direction:column; gap:8px">
+        <li class="card card-sub">✅ PEP 8 style — <code>snake_case</code> for functions and variables</li>
+        <li class="card card-sub">✅ Each game is a single self-contained function — no classes needed</li>
+        <li class="card card-sub">✅ <code>if __name__ == "__main__"</code> guard on every file</li>
+        <li class="card card-sub">✅ Do not remove enhancement task lists — they are part of the educational design</li>
+      </ul>
+    </section>
+
+    <!-- ── Known Issues ── -->
+    <section class="section" id="issues">
+      <div class="section-title"><span class="icon">🚧</span> Known Issues / Notes</div>
+      <div class="issue-list">
+        <div class="issue-item">
+          <div class="issue-num">#1</div>
+          <div class="issue-body"><strong>Duplicate <code>&lt;div class="timer-card"&gt;</code> in <code>index.html</code></strong> — around lines 37–40. Browser renders correctly due to error recovery, but should be cleaned up.</div>
+        </div>
+        <div class="issue-item">
+          <div class="issue-num">#2</div>
+          <div class="issue-body"><strong>No <code>package.json</code> / build tooling</strong> — zero dependencies, zero build steps. Do not add a bundler unless explicitly asked.</div>
+        </div>
+        <div class="issue-item">
+          <div class="issue-num">#3</div>
+          <div class="issue-body"><strong>Python games have no unit tests</strong> — rely on manual CLI interaction. If tests are needed, use <code>unittest</code> with <code>unittest.mock.patch</code> to mock <code>input()</code>.</div>
+        </div>
+        <div class="issue-item">
+          <div class="issue-num">#4</div>
+          <div class="issue-body"><strong>No long break mode</strong> — only <code>focus</code> and short <code>break</code> are implemented. Adding it requires a new key in <code>CONFIG</code>, a new gradient, and logic in <code>handleTimerEnd</code>.</div>
+        </div>
+        <div class="issue-item">
+          <div class="issue-num">#5</div>
+          <div class="issue-body"><strong>Daily stats reset</strong> — <code>pomo_today</code> is cleared when <code>new Date().toDateString()</code> differs from <code>pomo_date</code>. Runs at page load only.</div>
+        </div>
+        <div class="issue-item">
+          <div class="issue-num">#6</div>
+          <div class="issue-body"><strong>Audio requires user gesture</strong> — <code>AudioContext</code> starts suspended. <code>getAudioCtx()</code> handles <code>.resume()</code> automatically; bell only plays after the first Start click.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Roadmap ── -->
+    <section class="section" id="roadmap">
+      <div class="section-title"><span class="icon">✅</span> Enhancement Roadmap</div>
+
+      <h3>🍅 Pomodoro Timer</h3>
+      <ul class="checklist">
+        <li><span class="check-icon">☐</span>Long break mode (every 4th session)</li>
+        <li><span class="check-icon">☐</span>Settings panel (customisable durations)</li>
+        <li><span class="check-icon">☐</span>Sound toggle / volume control</li>
+        <li><span class="check-icon">☐</span>Browser <code>Notification</code> API for background alerts</li>
+        <li><span class="check-icon">☐</span>Task history / completed task log</li>
+        <li><span class="check-icon">☐</span>Dark/light theme toggle</li>
+      </ul>
+
+      <h3 style="margin-top:24px">🐍 Python Games</h3>
+      <ul class="checklist">
+        <li><span class="check-icon">☐</span><strong>Guess the Number:</strong> Hints, dynamic difficulty, GUI with <code>tkinter</code></li>
+        <li><span class="check-icon">☐</span><strong>Hangman:</strong> ASCII art gallows, larger word list, category selection</li>
+        <li><span class="check-icon">☐</span><strong>Tic-Tac-Toe:</strong> AI opponent (minimax), replay loop, 4×4 variant</li>
+      </ul>
+    </section>
+
+    <!-- ── AI Instructions ── -->
+    <section class="section" id="ai">
+      <div class="section-title"><span class="icon">🤖</span> Instructions for AI Agents</div>
+
+      <div class="ai-card"><span class="ai-bullet">📝</span><div class="ai-text"><strong>Before modifying <code>app.js</code>:</strong> Check the section banners and insert new code inside the appropriate section. Preserve the <code>// ─── ... ───</code> banner style.</div></div>
+      <div class="ai-card"><span class="ai-bullet">🎨</span><div class="ai-text"><strong>Before modifying <code>style.css</code>:</strong> Check if a CSS variable already exists for the colour/value before adding raw values.</div></div>
+      <div class="ai-card"><span class="ai-bullet">💾</span><div class="ai-text"><strong>Before adding features to the Pomodoro timer:</strong> Check if the <code>state</code> object needs a new field and if it should be persisted to <code>localStorage</code>.</div></div>
+      <div class="ai-card"><span class="ai-bullet">🐍</span><div class="ai-text"><strong>For Python games:</strong> Keep each game self-contained. Do not introduce imports beyond the Python standard library without explicit request.</div></div>
+      <div class="ai-card"><span class="ai-bullet">🚫</span><div class="ai-text"><strong>Do not introduce a build system</strong> (webpack, vite, etc.) unless explicitly requested.</div></div>
+      <div class="ai-card"><span class="ai-bullet">🌐</span><div class="ai-text"><strong>The web app runs without a server</strong> — keep it that way unless instructed otherwise.</div></div>
+      <div class="ai-card"><span class="ai-bullet">🐛</span><div class="ai-text"><strong>Fix the duplicate <code>&lt;div class="timer-card"&gt;</code></strong> in <code>index.html</code> if doing any HTML edits — it is a pre-existing bug.</div></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Copy button behaviour
+  function copyCode(btn) {
+    const pre = btn.closest('.code-block').querySelector('pre');
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+
+  // Active nav highlight on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navItems = document.querySelectorAll('.nav-item');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navItems.forEach(n => n.classList.remove('active'));
+        const active = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
